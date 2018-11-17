@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class MarkerCollection {
 
@@ -15,7 +16,7 @@ public class MarkerCollection {
 
     public static Marker getMarker(String driverId) {
         for (Marker marker : markerList)
-            if (marker.getTag() == driverId) return marker;
+            if (Objects.requireNonNull(marker.getTag()).equals(driverId)) return marker;
         return null;
     }
 

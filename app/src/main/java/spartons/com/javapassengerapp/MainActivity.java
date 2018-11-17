@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.*;
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseDriverLis
     public void onDriverAdded(Driver driver) {
         MarkerOptions markerOptions = googleMapHelper.getDriverMarkerOptions(new LatLng(driver.getLat(), driver.getLng()));
         Marker marker = googleMap.addMarker(markerOptions);
+        Log.e("Add new Driver -> ", driver.toString());
         marker.setTag(driver.getDriverId());
         MarkerCollection.insertMarker(marker);
         totalOnlineDrivers.setText(getResources()
@@ -142,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseDriverLis
 
     @Override
     public void onDriverUpdated(Driver driver) {
+        Log.e("Updated Driver -> ", driver.toString());
         Marker marker = MarkerCollection.getMarker(driver.getDriverId());
         assert marker != null;
         MarkerAnimationHelper.animateMarkerToGB(marker, new LatLng(driver.getLat(), driver.getLng()), new LatLngInterpolator.Spherical());
