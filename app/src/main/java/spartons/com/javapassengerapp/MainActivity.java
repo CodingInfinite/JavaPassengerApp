@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements FirebaseDriverLis
     private UiHelper uiHelper;
     private FirebaseEventListenerHelper firebaseEventListenerHelper;
     private FusedLocationProviderClient locationProviderClient;
+    
+    private Marker currentLocationMarker;
 
     private TextView totalOnlineDrivers;
 
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseDriverLis
                 locationFlag = false;
                 animateCamera(latLng);
             }
+            showOrAnimateUserMarker(latLng);
         }
     };
 
@@ -88,6 +91,17 @@ public class MainActivity extends AppCompatActivity implements FirebaseDriverLis
     private void animateCamera(LatLng latLng) {
         CameraUpdate cameraUpdate = googleMapHelper.buildCameraUpdate(latLng);
         googleMap.animateCamera(cameraUpdate);
+    }
+    
+    private void showOrAnimateUserMarker(LatLng latLng){
+        if (currentLocationMarker == null)
+            currentLocationMarker = googleMap.addMarker(googleMapHelper.getCurrentLocationMarker(latLng));
+        else
+            MarkerAnimationHelper.animateMarkerToGB(
+                    currentLocationMarker,
+                    new LatLng(latLng.latitude,
+                            latLng.longitude),
+                    new LatLngInterpolator.Spherical());
     }
 
     @SuppressLint("MissingPermission")
@@ -118,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements FirebaseDriverLis
     public void onDriverAdded(Driver driver) {
         MarkerOptions markerOptions = googleMapHelper.getDriverMarkerOptions(new LatLng(driver.getLat(), driver.getLng()));
         Marker marker = googleMap.addMarker(markerOptions);
-        Log.e("Add new Driver -> ", driver.toString());
         marker.setTag(driver.getDriverId());
         MarkerCollection.insertMarker(marker);
         totalOnlineDrivers.setText(getResources()
@@ -144,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements FirebaseDriverLis
 
     @Override
     public void onDriverUpdated(Driver driver) {
-        Log.e("Updated Driver -> ", driver.toString());
         Marker marker = MarkerCollection.getMarker(driver.getDriverId());
         assert marker != null;
         MarkerAnimationHelper.animateMarkerToGB(marker, new LatLng(driver.getLat(), driver.getLng()), new LatLngInterpolator.Spherical());
@@ -156,5 +168,6 @@ public class MainActivity extends AppCompatActivity implements FirebaseDriverLis
         databaseReference.removeEventListener(firebaseEventListenerHelper);
         locationProviderClient.removeLocationUpdates(locationCallback);
         MarkerCollection.clearMarkers();
+        currentLocationMarker = null;
     }
 }
