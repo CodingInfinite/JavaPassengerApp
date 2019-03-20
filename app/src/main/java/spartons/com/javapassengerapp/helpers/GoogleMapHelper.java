@@ -27,20 +27,34 @@ public class GoogleMapHelper {
         return CameraUpdateFactory.newCameraPosition(cameraPosition);
     }
 
+    
     /**
      * @param position where to draw the [com.google.android.gms.maps.model.Marker]
      * @return the [MarkerOptions] with given properties added to it.
      */
 
     public MarkerOptions getDriverMarkerOptions(LatLng position) {
-        MarkerOptions options = getMarkerOptions(position);
-        options.flat(true);
-        return options;
+        return  getMarkerOptions(position, R.drawable.car_icon);
     }
 
-    private MarkerOptions getMarkerOptions(LatLng position) {
+    /**
+     * @param position where to draw the user current location marker;
+     * @return the [{@link MarkerOptions}] with the given properties add to it.
+     */
+
+    public MarkerOptions getCurrentLocationMarker(LatLng position) {
+        return getMarkerOptions(position, 0);
+    }
+
+    private MarkerOptions getMarkerOptions(LatLng position, int resource) {
+        BitmapDescriptor bitmapDescriptor;
+        if (resource != 0)
+            bitmapDescriptor = BitmapDescriptorFactory.fromResource(resource);
+        else
+            bitmapDescriptor = BitmapDescriptorFactory.defaultMarker();
         return new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.car_icon))
-                .position(position);
+                .icon(bitmapDescriptor)
+                .position(position)
+                .flat(true);
     }
 }
